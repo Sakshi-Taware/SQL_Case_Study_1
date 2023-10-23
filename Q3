@@ -1,0 +1,31 @@
+3. What was the first item from the menu purchased by each customer?
+
+SELECT s.customer_id, m.product_name as first_order_item,s.order_date AS first_order_date
+FROM (
+  SELECT customer_id, MIN(order_date) AS first_purchase_date
+  FROM sales
+  GROUP BY customer_id
+) AS a
+JOIN sales AS s ON a.customer_id = s.customer_id AND a.first_purchase_date = s.order_date
+JOIN menu AS m ON s.product_id = m.product_id;
+
+
+
+WITH final AS (
+  SELECT
+    s.*,
+    m.product_name,
+    RANK() OVER (PARTITION BY customer_id ORDER BY order_date) AS ranking
+  FROM
+    dannys_diner.sales s
+  JOIN
+    dannys_diner.menu m ON s.product_id = m.product_id
+)
+SELECT
+  customer_id,
+  order_date AS first_order_date,
+  product_name AS first_order_item
+FROM
+  final
+WHERE
+  ranking = 1;
