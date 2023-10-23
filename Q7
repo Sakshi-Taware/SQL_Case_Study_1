@@ -1,0 +1,29 @@
+#7. Which item was purchased just before the customer became a member?
+SELECT 
+  s.customer_id,
+  mem.join_date AS joining_date,
+  s.order_date,
+  m.product_name
+  
+FROM 
+  sales AS s
+JOIN
+  (
+    SELECT 
+      s.customer_id, 
+      MAX (s.order_date) AS min_date
+    FROM 
+      sales AS s
+    RIGHT JOIN
+      members AS mem ON s.customer_id = mem.customer_id
+    WHERE
+      mem.join_date > s.order_date
+    GROUP BY
+      s.customer_id
+  ) AS a ON s.customer_id = a.customer_id AND s.order_date = a.min_date
+JOIN 
+  menu m ON s.product_id = m.product_id
+JOIN 
+  members mem ON s.customer_id = mem.customer_id
+ORDER BY
+  s.customer_id;
