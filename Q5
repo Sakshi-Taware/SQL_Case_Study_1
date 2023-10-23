@@ -1,0 +1,14 @@
+5. Which item was the most popular for each customer?
+
+WITH purchase_counts AS (
+  SELECT
+    s.customer_id,
+    m.product_name,
+    COUNT(*) AS purchase_count
+  FROM
+    sales s
+  JOIN
+    menu m ON s.product_id = m.product_id
+  GROUP BY
+    s.customer_id, m.product_name
+),
